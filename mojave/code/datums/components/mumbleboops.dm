@@ -25,7 +25,7 @@
 	. = ..()
 	UnregisterSignal(parent, COMSIG_MOB_POST_SAY)
 
-/datum/component/mumbleboop/proc/after_say(mob/mumblebooper, list/speech_args, list/speech_spans, list/speech_mods)
+/datum/component/mumbleboop/proc/after_say(mob/mumblebooper, list/speech_args, list/speech_spans, list/speech_mods, list/message_mods)
 	SIGNAL_HANDLER
 
 	last_mumbleboop = world.time
@@ -62,75 +62,19 @@
 		//var/pitch = initial_pitch Disabled for now. Doesn't work as intended- seemingly anything above default is dumb sounding
 		var/falloff_exponent = initial_falloff
 		var/current_delay = initial_delay
-		switch(lowertext(message[i])) // A super convoluted list of checks, I know. I doubt there's a better way to do it.
-			if("a")
-				boop_letter = "A"
-			if("b")
-				boop_letter = "B"
-			if("c")
-				boop_letter = "C"
-			if("d")
-				boop_letter = "D"
-			if("e")
-				boop_letter = "E"
-			if("f")
-				boop_letter = "F"
-			if("g")
-				boop_letter = "G"
-			if("h")
-				boop_letter = "H"
-			if("i")
-				boop_letter = "I"
-			if("j")
-				boop_letter = "J"
-			if("k")
-				boop_letter = "K"
-			if("l")
-				boop_letter = "L"
-			if("m")
-				boop_letter = "M"
-			if("n")
-				boop_letter = "N"
-			if("o")
-				boop_letter = "O"
-			if("p")
-				boop_letter = "P"
-			if("q")
-				boop_letter = "Q"
-			if("r")
-				boop_letter = "R"
-			if("s")
-				boop_letter = "S"
-			if("t")
-				boop_letter = "T"
-			if("u")
-				boop_letter = "U"
-			if("v")
-				boop_letter = "V"
-			if("w")
-				boop_letter = "W"
-			if("x")
-				boop_letter = "X"
-			if("y")
-				boop_letter = "Y"
-			if("z")
-				boop_letter = "Z"
-			if("!")
-				volume = 0
-				current_delay *= 1.5
-			if("?")
-				volume = 0
-				current_delay *= 2
+		switch(lowertext(message[i]))
 			if(",", ";", "-")
+				boop_letter = null
 				volume = 0
 				current_delay *= 1.5
-			if(".")
+
+			if(".", "?", "!")
+				boop_letter = null
 				volume = 0
-				current_delay *= 2
+				current_delay *= 3
 
 			else // This is to avoid any special characters not covered doing some weird stuff. Things like the ' symbol would duplicate the last played phonetic ~3 times. Sounded weird.
-				volume = 0
-				current_delay -= 1
+				boop_letter = (lowertext(message[i]))
 
 		final_boop = "mojave/sound/voices/[chosen_boop]/s_[boop_letter].wav"
 		addtimer(CALLBACK(src, PROC_REF(play_mumbleboop), hearers, mumblebooper, final_boop, volume, initial_mumbleboop_time, falloff_exponent), mumbleboop_delay_cumulative + current_delay)
